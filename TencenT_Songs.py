@@ -158,7 +158,6 @@ class TencenTSongs(ctk.CTk):
                     title = os.path.basename(file)
                     artist = "Bilinmiyor"
                     if audio.tags:
-                        # TIT2: Başlık, TPE1: Sanatçı
                         title = str(audio.tags.get("TIT2", title))
                         artist = str(audio.tags.get("TPE1", artist))
                     self.music_library.append({
@@ -270,20 +269,17 @@ class TencenTSongs(ctk.CTk):
         pygame.mixer.music.set_volume(value)
     
     def seek_music(self, value):
-        if self.is_playing and hasattr(self, 'total_length') and self.total_length:
-            pos = (float(value) / 100) * self.total_length
-            try:
-                pygame.mixer.music.rewind()
-                pygame.mixer.music.set_pos(pos)
-            except:
-                pass
+        if self.is_playing and self.total_length:
+            pos = (value / 100) * self.total_length
+            pygame.mixer.music.rewind()
+            pygame.mixer.music.set_pos(pos)
     
     def music_updater(self):
         while self.running:
             if self.is_playing and not self.is_paused:
                 try:
                     pos = pygame.mixer.music.get_pos() / 1000  # saniye
-                    if hasattr(self, 'total_length') and self.total_length > 0:
+                    if self.total_length > 0:
                         progress = (pos / self.total_length) * 100
                         self.progress_slider.set(progress)
                         self.time_label.configure(text=f"{self.format_time(pos)} / {self.format_time(self.total_length)}")
@@ -316,19 +312,18 @@ class TencenTSongs(ctk.CTk):
     def show_playlist(self, name):
         # Playlist içeriğini göster
         songs = self.playlists[name]
-        # Şimdilik basit bir bilgi mesajı
+        # ... (burayı detaylandırabiliriz)
         messagebox.showinfo("Playlist", f"{name}: {len(songs)} şarkı")
     
     def add_to_playlist_menu(self, song):
-        # Eğer playlist varsa basit bir seçim yap (ilk playlist'e ekle)
+        # Popup menü yapılabilir, şimdilik basit
         if self.playlists:
             pl_names = list(self.playlists.keys())
-            # İleride bir seçim penceresi yapılabilir. Şimdi ilk playlist'e ekleyelim.
-            self.playlists[pl_names[0]].append(song["path"])
+            # Burada bir seçim penceresi açılabilir.
+            # Örnek: İlk playlist'e ekle
+            first_pl = pl_names[0]
+            self.playlists[first_pl].append(song["path"])
             self.save_data()
-            messagebox.showinfo("Eklendi", f"{song['title']} {pl_names[0]} playlistine eklendi.")
-        else:
-            messagebox.showinfo("Playlist Yok", "Lütfen önce bir playlist oluşturun.")
     
     def on_closing(self):
         self.running = False
